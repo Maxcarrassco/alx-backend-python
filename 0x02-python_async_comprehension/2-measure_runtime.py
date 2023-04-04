@@ -10,6 +10,6 @@ async def measure_runtime() -> float:
     started = time.perf_counter()
     await asyncio.gather(
             async_comprehension(), async_comprehension(),
-            async_comprehension())
+            async_comprehension(), async_comprehension())
     elased = time.perf_counter() - started
     return elased
