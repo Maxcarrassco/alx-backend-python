@@ -3,7 +3,7 @@
 from parameterized import parameterized
 from client import GithubOrgClient
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -22,3 +22,12 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_get_json.return_value = expect
         git_org = GithubOrgClient(org)
         self.assertAlmostEqual(git_org.org, expect)
+
+    def test_public_repos_url(self):
+        """Test if org method from GithubOrgClient return the right output."""
+        with patch.object(GithubOrgClient,
+                          '_public_repos_url') as mock_public_repos_url:
+            expect = 'https://api.github.com/orgs/google/repos'
+            git_org = GithubOrgClient('google')
+            mock_public_repos_url.__get__ = Mock(return_value=expect)
+            self.assertEqual(git_org._public_repos_url, expect)
