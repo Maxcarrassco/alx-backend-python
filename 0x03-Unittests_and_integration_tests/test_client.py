@@ -21,7 +21,7 @@ class TestGithubOrgClient(unittest.TestCase):
                 }
         mock_get_json.return_value = expect
         git_org = GithubOrgClient(org)
-        self.assertAlmostEqual(git_org.org, expect)
+        self.assertEqual(git_org.org, expect)
 
     def test_public_repos_url(self):
         """Test if org method from GithubOrgClient return the right output."""
@@ -45,7 +45,9 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_get_json.return_value = expect
         with patch.object(GithubOrgClient,
                           '_public_repos_url') as mock_public_repos_url:
-            expect = f'https://api.github.com/orgs/{org}/repos'
             git_org = GithubOrgClient(org)
+            self.assertEqual(git_org.org, expect)
+            expect = f'https://api.github.com/orgs/{org}/repos'
             mock_public_repos_url.__get__ = Mock(return_value=expect)
             self.assertEqual(git_org._public_repos_url, expect)
+            mock_get_json.assert_called_once()
