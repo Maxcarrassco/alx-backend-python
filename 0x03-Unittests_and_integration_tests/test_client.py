@@ -4,6 +4,7 @@ from parameterized import parameterized
 from client import GithubOrgClient
 import unittest
 from unittest.mock import patch, Mock
+from typing import Dict
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -51,3 +52,13 @@ class TestGithubOrgClient(unittest.TestCase):
             mock_public_repos_url.__get__ = Mock(return_value=expect)
             self.assertEqual(git_org._public_repos_url, expect)
             mock_get_json.assert_called_once()
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "my_other_license"}}, "my_license", False)
+        ])
+    def test_has_license(self, repo: Dict[str, Dict],
+                         license_key: str, expect: bool):
+        """Test if org method from GithubOrgClient return the right output."""
+        git_org = GithubOrgClient('google')
+        self.assertEqual(git_org.has_license(repo, license_key), expect)
