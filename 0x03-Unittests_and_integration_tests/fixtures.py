@@ -1,68 +1,6 @@
 #!/usr/bin/env python3
-"""Client Unittest Module."""
-from parameterized import parameterized
-from client import GithubOrgClient
-import unittest
-from unittest.mock import patch, Mock
-from typing import Dict
 
-
-class TestGithubOrgClient(unittest.TestCase):
-    """Implement all test cases for org function from the client script."""
-
-    @parameterized.expand([
-        'google',
-        'abc'
-        ])
-    @patch('client.get_json')
-    def test_org(self, org: str, mock_get_json):
-        """Test if org method from GithubOrgClient return the right output."""
-        expect = {
-                "repo_url": f"https://api.github.com/orgs/{org}"
-                }
-        mock_get_json.return_value = expect
-        git_org = GithubOrgClient(org)
-        self.assertEqual(git_org.org, expect)
-
-    def test_public_repos_url(self):
-        """Test if org method from GithubOrgClient return the right output."""
-        with patch.object(GithubOrgClient,
-                          '_public_repos_url') as mock_public_repos_url:
-            expect = 'https://api.github.com/orgs/google/repos'
-            git_org = GithubOrgClient('google')
-            mock_public_repos_url.__get__ = Mock(return_value=expect)
-            self.assertEqual(git_org._public_repos_url, expect)
-
-    
-    @patch('client.get_json')
-    def test_public_repos(self, mock_get_json):
-        """Test if org method from GithubOrgClient return the right output."""
-        for org in ['google', 'abc']:
-            expect = {
-                    "repo_url": f"https://api.github.com/orgs/{org}"
-                    }
-            mock_get_json.return_value = expect
-            with patch.object(GithubOrgClient,
-                              '_public_repos_url') as mock_public_repos_url:
-                git_org = GithubOrgClient(org)
-                self.assertEqual(git_org.org, expect)
-                expect = f'https://api.github.com/orgs/{org}/repos'
-                mock_public_repos_url.__get__ = Mock(return_value=expect)
-                self.assertEqual(git_org._public_repos_url, expect)
-
-
-    @parameterized.expand([
-        ({"license": {"key": "my_license"}}, "my_license", True),
-        ({"license": {"key": "my_other_license"}}, "my_license", False)
-        ])
-    def test_has_license(self, repo: Dict[str, Dict],
-                         license_key: str, expect: bool):
-        """Test if org method from GithubOrgClient return the right output."""
-        git_org = GithubOrgClient('google')
-        self.assertEqual(git_org.has_license(repo, license_key), expect)
-
-
-@parameterized.expand([
+TEST_PAYLOAD = [
   (
     {"repos_url": "https://api.github.com/orgs/google/repos"},
     [
@@ -1009,16 +947,4 @@ class TestGithubOrgClient(unittest.TestCase):
     ['episodes.dart', 'cpp-netlib', 'dagger', 'ios-webkit-debug-proxy', 'google.github.io', 'kratu', 'build-debian-cloud', 'traceur-compiler', 'firmata.py'],
     ['dagger', 'kratu', 'traceur-compiler', 'firmata.py'],
   )
-])
-class TestIntegrationGithubOrgClient(unittest.TestCase):
-    """Implement integration test for Github Org Client."""
-
-    def setUpClass(self):
-        """Set the env for each test."""
-        self.patcher = patch('util.requests.get')
-        self.mock_requests_get = self.patcher.start()
-        self.mock_requests_get.call_args_list
-
-    def tearDownClass(self):
-        """Tear down the env after each test."""
-        self.patcher.stop()
+]
