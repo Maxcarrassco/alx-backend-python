@@ -66,14 +66,17 @@ class TestGithubOrgClient(unittest.TestCase):
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Implement integration test for Github Org Client."""
 
-    def setUpClass(self):
+    @classmethod
+    def setUpClass(cls):
         """Set the env for each test."""
-        self.patcher = patch('util.requests.get')
-        self.get_patcher = self.patcher.start()
-        self.get_patcher.side_effect = [
-                TEST_PAYLOAD
+        cls.patcher = patch('util.requests.get')
+        cls.get_patcher = cls.patcher.start()
+        cls.get_patcher.side_effect = [
+                cls.org_payload, cls.repos_payload,
+                cls.org_payload, cls.repos_payload
                 ]
 
-    def tearDownClass(self):
+    @classmethod
+    def tearDownClass(cls):
         """Tear down the env after each test."""
-        self.patcher.stop()
+        cls.get_patcher.stop()
