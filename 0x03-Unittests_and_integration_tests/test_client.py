@@ -71,7 +71,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """Set the env for each test."""
         cls.get_patcher = patch('requests.get')
         cls.mock_get = cls.get_patcher.start()
-        cls.mock_get.side_effect = [
+        cls.mock_get.return_value.json.side_effect = [
                 cls.org_payload, cls.repos_payload,
                 cls.org_payload, cls.repos_payload
                 ]
@@ -80,3 +80,19 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     def tearDownClass(cls):
         """Tear down the env after each test."""
         cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """Test if org method from GithubOrgClient return the right output."""
+        client = GithubOrgClient('google')
+        repos = client.public_repos()
+        self.assertEqual(len(repos), len(self.expected_repos))
+        for repo in repos:
+            self.assertIn(repo, self.expected_repos)
+
+    def test_public_repos_with_license(self):
+        """Test if org method from GithubOrgClient return the right output."""
+        client = GithubOrgClient('google')
+        repos = client.public_repos("apache-2.0")
+        self.assertEqual(len(repos), len(self.apache2_repos))
+        for repo in repos:
+            self.assertIn(repo, self.apache2_repos)
