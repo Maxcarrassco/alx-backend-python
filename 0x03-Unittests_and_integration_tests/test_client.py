@@ -31,3 +31,21 @@ class TestGithubOrgClient(unittest.TestCase):
             git_org = GithubOrgClient('google')
             mock_public_repos_url.__get__ = Mock(return_value=expect)
             self.assertEqual(git_org._public_repos_url, expect)
+
+    @parameterized.expand([
+        'google',
+        'abc'
+        ])
+    @patch('client.get_json')
+    def test_public_repos(self, org: str, mock_get_json):
+        """Test if org method from GithubOrgClient return the right output."""
+        expect = {
+                "repo_url": f"https://api.github.com/orgs/{org}"
+                }
+        mock_get_json.return_value = expect
+        with patch.object(GithubOrgClient,
+                          '_public_repos_url') as mock_public_repos_url:
+            expect = f'https://api.github.com/orgs/{org}/repos'
+            git_org = GithubOrgClient(org)
+            mock_public_repos_url.__get__ = Mock(return_value=expect)
+            self.assertEqual(git_org._public_repos_url, expect)
